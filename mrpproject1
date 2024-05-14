@@ -1,0 +1,33 @@
+from flask import Flask, render_template, request, session, flash
+import mysql.connector
+
+app = Flask(_name_)
+app.secret_key = 'your_secret_key'
+
+# Establish database connection
+mydb = mysql.connector.connect(
+    host="localhost",
+    user="root",
+    password="root",
+    database="vtpai17_2021"
+)
+
+# Helper function to execute SQL queries
+def execute_query(query, values=None):
+    cursor = mydb.cursor()
+    if values:
+        cursor.execute(query, values)
+    else:
+        cursor.execute(query)
+    result = cursor.fetchall()
+    cursor.close()
+    return result
+
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# Add other routes and functionalities here
+
+if _name_ == '_main_':
+    app.run(debug=True)
