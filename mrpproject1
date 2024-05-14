@@ -1,33 +1,86 @@
 from flask import Flask, render_template, request, session, flash
+from datetime import datetime
+import generate
+app = Flask(__name__)
 import mysql.connector
-
-app = Flask(_name_)
-app.secret_key = 'your_secret_key'
-
-# Establish database connection
 mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="root",
-    database="vtpai17_2021"
+ host="localhost",
+ user="root",
+ password="root",
+ database="vtpai17_2021"
 )
-
-# Helper function to execute SQL queries
-def execute_query(query, values=None):
-    cursor = mydb.cursor()
-    if values:
-        cursor.execute(query, values)
-    else:
-        cursor.execute(query)
-    result = cursor.fetchall()
-    cursor.close()
-    return result
-
+app.secret_key = 'your secret key'
 @app.route('/')
 def home():
-    return render_template('index.html')
-
-# Add other routes and functionalities here
-
-if _name_ == '_main_':
-    app.run(debug=True)
+ return render_template('index.html')
+@app.route('/admin')
+def admin():
+ return render_template('admin.html')
+@app.route('/alogin', methods = ['POST', 'GET'])
+def alogin():
+ if request.method == 'POST':
+uid = request.form['uid']
+pwd = request.form['pwd']
+34
+ if uid == 'admin' and pwd == 'admin':
+ return render_template('ahome.html')
+ else:
+flash("Please Enter Valid Details")
+ return render_template('admin.html')
+@app.route('/ahome')
+def ahome():
+ return render_template('ahome.html')
+@app.route('/aowner')
+def aowner():
+ cursor = mydb.cursor()
+cursor.execute('select * from owner')
+ d = cursor.fetchall()
+ return render_template('aowner.html', result = d)
+@app.route('/auser')
+def auser():
+ cursor = mydb.cursor()
+cursor.execute('select * from user')
+ d = cursor.fetchall()
+ return render_template('auser.html', result = d)
+@app.route('/adata')
+def adata():
+ cursor = mydb.cursor()
+35
+cursor.execute('select * from odata')
+ d = cursor.fetchall()
+ return render_template('adata.html', result = d)
+@app.route('/asearch')
+def asearch():
+ cursor = mydb.cursor()
+cursor.execute('select * from search')
+ d = cursor.fetchall()
+ return render_template('asearch.html', result = d)
+@app.route('/logout')
+def logout():
+session.pop('username', None)
+ return render_template('index.html')
+@app.route('/owner')
+def owner():
+ return render_template('owner.html')
+@app.route('/oreg')
+def oreg():
+ return render_template('oreg.html')
+@app.route('/dreg', methods = ['POST', 'GET'])
+def dreg():
+ if request.method == 'POST':
+36
+ name = request.form['name']
+uid = request.form['uid']
+pwd = request.form['pwd']
+ mob = request.form['mob']
+ loc = request.form['loc']
+ var = (name, uid, pwd, mob, loc)
+ cursor = mydb.cursor()
+cursor.execute('insert into owner values(%s, %s, %s, %s, %s)', var)
+mydb.commit()
+ if cursor.rowcount == 1:
+flash("Data Owner Registered Successfuly")
+ return render_template('owner.html')
+ else:
+flash("Please Enter Valid Details")
+ return render_template('oreg.html')
